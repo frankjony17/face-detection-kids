@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <title>Video Streaming Demonstration</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/index.css') }}">
+    <script type="text/javascript" src="{{ url_for('static', filename='confetti.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='confetti.js') }}"></script>
+  </head>
+
+  <body>
+    <div class="image-background"></div>
+
+    <section class="container flex">
+      <div class="item">
+        <img id="streaming_id" class="streaming" src="{{ url_for('video_feed') }}">
+      </div>
+    </section>
+    
+    <section class='localheroi'>
+      <img id="heroi_id" class="heroi" src="{{ url_for('static', filename='images/liga.gif') }}">
+    </section>
+
+    <section style='position:absolute; top:685px; left: 330px;'>
+      <img id="counter_id"  width=100 height=175 src="{{ url_for('static', filename='images/0.png') }}">
+    </section>
+    
+    <audio id="sound_id" src=""></audio>
+
+    <script type="text/javascript">
+      let fem_list = JSON.parse(localStorage.getItem("fem_list"));
+      let mas_list = JSON.parse(localStorage.getItem("mas_list"))
+      let sound_fem_list = JSON.parse(localStorage.getItem("sound_fem_list"));
+      let sound_mas_list = JSON.parse(localStorage.getItem("sound_mas_list"))
+
+      if (mas_list == null) {
+        fem_list = [
+          "{{ url_for('static', filename='images/0_fem.png') }}",
+          "{{ url_for('static', filename='images/1_fem.png') }}",
+          "{{ url_for('static', filename='images/2_fem.png') }}"
+        ]
+        sound_fem_list = [
+          "{{ url_for('static', filename='sound/0_fem_som.mpeg') }}",
+          "{{ url_for('static', filename='sound/1_fem_som.mpeg') }}",
+          "{{ url_for('static', filename='sound/2_fem_som.mpeg') }}"
+        ]
+        mas_list = [
+          "{{ url_for('static', filename='images/0_mas.png') }}",
+          "{{ url_for('static', filename='images/1_mas.png') }}",
+          "{{ url_for('static', filename='images/2_mas.png') }}"
+        ]
+        sound_mas_list = [
+          "{{ url_for('static', filename='sound/0_mas_som.mpeg') }}",
+          "{{ url_for('static', filename='sound/1_mas_som.mpeg') }}",
+          "{{ url_for('static', filename='sound/2_mas_som.mpeg') }}"
+        ]
+        localStorage.setItem("fem_list", JSON.stringify(fem_list));
+        localStorage.setItem("sound_fem_list", JSON.stringify(sound_fem_list));
+        localStorage.setItem("mas_list", JSON.stringify(mas_list));
+        localStorage.setItem("sound_mas_list", JSON.stringify(sound_mas_list));
+      }
+
+      function fem_heroi() {
+        document.getElementById('counter_id').src="{{ url_for('static', filename='images/0.png') }}";
+        document.getElementById('heroi_id').src = fem_list[0];
+        document.getElementById('sound_id').src = sound_fem_list[0];
+        document.getElementById('sound_id').play()
+        fem_list.push(fem_list[0])
+        sound_fem_list.push(sound_fem_list[0])
+        fem_list.shift()
+        sound_fem_list.shift()
+        localStorage.setItem("fem_list", JSON.stringify(fem_list));
+        localStorage.setItem("sound_fem_list", JSON.stringify(sound_fem_list));
+      }
+
+      function mas_heroi() {
+        document.getElementById('counter_id').src="{{ url_for('static', filename='images/0.png') }}";
+        document.getElementById('heroi_id').src = mas_list[0];
+        document.getElementById('sound_id').src = sound_mas_list[0];
+        document.getElementById('sound_id').play()
+        mas_list.push(mas_list[0])
+        sound_mas_list.push(sound_mas_list[0])
+        mas_list.shift()
+        sound_mas_list.shift()
+        localStorage.setItem("mas_list", JSON.stringify(mas_list));
+        localStorage.setItem("sound_mas_list", JSON.stringify(sound_mas_list));
+      }
+
+      window.addEventListener('keydown', this.check, false);
+
+      function check(e) {
+          if (e.keyCode == "70") {
+              document.getElementById('streaming_id').src="{{ url_for('get_frame') }}";
+              me_timer(1);
+          }
+          if (e.keyCode == "77") {
+              document.getElementById('streaming_id').src="{{ url_for('get_frame') }}";
+              me_timer(2);
+          }
+          console.log(e.keyCode)
+      }
+
+      let counter = 0;
+      let counter_list = [
+        "{{ url_for('static', filename='images/1.png') }}",
+        "{{ url_for('static', filename='images/2.png') }}",
+        "{{ url_for('static', filename='images/3.png') }}"
+      ]
+      function me_timer(sex) {
+          var timer = setTimeout( function() {
+              if( counter < 3 ) {
+                  document.getElementById('counter_id').src=counter_list[counter];
+                  counter++;
+                  me_timer(sex);
+              } else {
+                confetti.start();
+                if (sex == 1) {
+                  fem_heroi()
+                }
+                else {
+                  mas_heroi()
+                }
+              }
+          }, 780 );
+      }
+    </script>
+  </body>
+</html>
